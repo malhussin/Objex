@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Secrets — never commit a service account key
+.env
+.env.local
+.env.*.local
+.objex/
+google-credentials.json
+*.json.key
+
+# Misc
+.DS_Store
+npm-debug.log*
+yarn-error.log*
+.vscode/
+.idea/

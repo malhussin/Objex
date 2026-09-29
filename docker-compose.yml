@@ -1,0 +1,45 @@
+services:
+  objex:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: objex:latest
+    container_name: objex
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+
+    # Nothing here is required. Start the container, open http://localhost:3000
+    # and enter the service account key and bucket in the setup screen; Objex
+    # saves them to the volume below.
+    environment:
+      NODE_ENV: production
+
+      # Optional: require a token before anyone can change the connection from
+      # the UI. Recommended if Objex is reachable by more than you.
+      # OBJEX_ADMIN_TOKEN: change-me
+
+      # Optional overrides. Anything set here wins over what is entered in the
+      # UI, and that field is shown as read-only ("managed by environment").
+      # GCP_BUCKET_NAME: my-bucket-name
+      # GCP_PROJECT_ID: my-gcp-project
+      # GOOGLE_APPLICATION_CREDENTIALS: /secrets/google-credentials.json
+
+    volumes:
+      # Keeps the connection (including the service account key) across
+      # restarts. Remove this volume to reset Objex to the setup screen.
+      - objex-config:/app/data
+
+      # Only needed if you prefer mounting a key file over entering it in the
+      # UI; pair it with GOOGLE_APPLICATION_CREDENTIALS above.
+      # - ./google-credentials.json:/secrets/google-credentials.json:ro
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  objex-config:
